@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 ### Load configuration
 echo "$STITCH_CONFIG" > persist.json
 echo "$TAP_CONFIG" > config.json
