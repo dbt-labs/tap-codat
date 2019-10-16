@@ -37,6 +37,8 @@ class capture_state(ContextDecorator):
         state_dt = get_last_record_value_for_table(self.ctx.state, company_stream)
         if state_dt:
             return state_dt.strftime('%Y-%m-%dT%H:%M:%S.00Z')
+        else:
+            return self.ctx.config.get('start_date')
 
     def update(self, records):
         if self.field_name is None:
@@ -162,9 +164,8 @@ class Basic(Stream):
     def get_incremental_filter(self, ctx, sync):
         max_dt = sync.get_max()
         if max_dt and self.state_filter is not None:
-            state = max_dt.strftime('%Y-%m-%dT%H:%M:%S.00Z')
             return {
-                "query": "{}>{}".format(self.state_filter, state)
+                "query": "{}>{}".format(self.state_filter, max_dt)
             }
         else:
             return {}
@@ -230,7 +231,7 @@ class Events(Basic):
         max_dt = sync.get_max()
         if max_dt:
             return {
-                "fromDate": max_dt.strftime('%Y-%m-%dT%H:%M:%S.00Z')
+                "fromDate": max_dt
             }
         else:
             return {}
@@ -261,6 +262,11 @@ class Paginated(Basic):
             path = self.path.format(companyId=company["id"])
             page = 1
             while True:
+                LOGGER.info("Syncing page {} for {} stream (company={})".format(
+                    page,
+                    self.tap_stream_id,
+                    company['id']
+                ))
                 params = self.get_params(ctx, sync, page)
                 resp = ctx.client.GET({"path": path, "params": params}, self.tap_stream_id)
                 records = self.transform_dts(ctx, self.format_response(resp, company))
