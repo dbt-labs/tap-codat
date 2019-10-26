@@ -2,6 +2,7 @@ import singer
 from singer import metrics
 from singer.transform import transform as tform
 from .transform import transform_dts
+import json
 
 from tap_codat.state import incorporate, save_state, \
     get_last_record_value_for_table
@@ -79,6 +80,13 @@ class Stream(object):
             counter.increment(len(records))
 
     def write_records(self, records):
+        for record in records:
+            asjson = json.dumps(record)
+            length = len(asjson)
+            max_length = 4*1024*1024
+            if length > max_length:
+                LOGGER.info("Saw record that was {} bytes".format(length))
+                LOGGER.info(asjson[0:1024])
         singer.write_records(self.tap_stream_id, records)
         self.metrics(records)
 
