@@ -80,13 +80,17 @@ class Stream(object):
             counter.increment(len(records))
 
     def write_records(self, records):
+        # Debugging for extra long lines that exceed the Stitch
+        # maximum record size (4 mb)
         for record in records:
             asjson = json.dumps(record)
             length = len(asjson)
             max_length = 4*1024*1024
             if length > max_length:
-                LOGGER.info("Saw record that was {} bytes".format(length))
-                LOGGER.info(asjson[0:1024])
+                record_id = record.get('id', 'unknown')
+                LOGGER.info("I saw record that was {} bytes ({})".format(
+                    length, record_id))
+
         singer.write_records(self.tap_stream_id, records)
         self.metrics(records)
 
@@ -344,6 +348,18 @@ def flatten_profit_and_loss(pnls):
     return pnls
 
 
+def trunc_payment_allocation_notes(invoices):
+    for invoice in invoices:
+        payment_allocations = invoice.get('paymentAllocations', [])
+        for allocation in payment_allocations:
+            note = allocation.get('note')
+            if isinstance(note, str) and len(note) > 1024:
+                LOGGER.info("trunc from {} to 1024".format(len(note)))
+                allocation['note'] = note[0:1024]
+
+    return invoices
+
+
 companies = Companies("companies", ["id"], "/companies")
 all_streams = [
     companies,
@@ -410,7 +426,8 @@ all_streams = [
               ["id", "companyId"],
               "/companies/{companyId}/data/invoices",
               collection_key="results",
-              state_filter="modifiedDate"),
+              state_filter="modifiedDate",
+              custom_formatter=trunc_payment_allocation_notes),
     Paginated("journal_entries",
               ["id", "companyId"],
               "/companies/{companyId}/data/journalEntries",
