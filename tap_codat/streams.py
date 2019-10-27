@@ -354,7 +354,6 @@ def trunc_payment_allocation_notes(invoices):
         for allocation in payment_allocations:
             note = allocation.get('note')
             if isinstance(note, str) and len(note) > 1024:
-                LOGGER.info("trunc from {} to 1024".format(len(note)))
                 allocation['note'] = note[0:1024]
 
     return invoices
