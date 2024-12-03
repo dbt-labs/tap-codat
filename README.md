@@ -1,3 +1,15 @@
+# ***Archival Notice***
+This repository has been archived.
+
+As a result all of its historical issues and PRs have been closed.
+
+Please *do not clone* this repo without understanding the risk in doing so:
+- It may have unaddressed security vulnerabilities
+- It may have unaddressed bugs
+
+<details>
+   <summary>Click for historical readme</summary>
+
 # tap-codat
 
 This is a [Singer](https://singer.io) tap that produces JSON-formatted data
@@ -39,9 +51,9 @@ This tap:
 
    ```json
    {
-     "start_date": "2010-01-01",
-     "api_key": "your-api-key",
-     "uat_urls": "true"
+     &quot;start_date&quot;: &quot;2010-01-01&quot;,
+     &quot;api_key&quot;: &quot;your-api-key&quot;,
+     &quot;uat_urls&quot;: &quot;true&quot;
    }
    ```
 
@@ -66,19 +78,19 @@ This tap:
 
 ## Data Formatting
 
-For a few endpoints, this tap reformats the structure of "reports" received
+For a few endpoints, this tap reformats the structure of &quot;reports&quot; received
 from Codat. An example is the `balance_sheets` stream, which returns a
 structure like this:
 
 ```json
-"reports": [
+&quot;reports&quot;: [
     {
-        "assets": {
-            "name": "Top-level Category",
-            "value": 1,
-            "items": [
-                {"name": "Inner category A", "value": 2},
-                {"name": "Inner category B", "value": 3}
+        &quot;assets&quot;: {
+            &quot;name&quot;: &quot;Top-level Category&quot;,
+            &quot;value&quot;: 1,
+            &quot;items&quot;: [
+                {&quot;name&quot;: &quot;Inner category A&quot;, &quot;value&quot;: 2},
+                {&quot;name&quot;: &quot;Inner category B&quot;, &quot;value&quot;: 3}
             ]
         }
     }
@@ -92,34 +104,34 @@ this, this tap restructures this data into this format:
 
 
 ```json
-"reports": [
+&quot;reports&quot;: [
     {
-        "assets": [
+        &quot;assets&quot;: [
             {
-                "name": "Top-level Category",
-                "value": 1,
-                "name_0": "Top-level Category"
+                &quot;name&quot;: &quot;Top-level Category&quot;,
+                &quot;value&quot;: 1,
+                &quot;name_0&quot;: &quot;Top-level Category&quot;
             },
             {
-                "name": "Inner category A",
-                "value": 2,
-                "name_0": "Top-level Category",
-                "name_1": "Inner category A"
+                &quot;name&quot;: &quot;Inner category A&quot;,
+                &quot;value&quot;: 2,
+                &quot;name_0&quot;: &quot;Top-level Category&quot;,
+                &quot;name_1&quot;: &quot;Inner category A&quot;
             },
             {
-                "name": "Inner category B",
-                "value": 3,
-                "name_0": "Top-level Category",
-                "name_1": "Inner category B"
+                &quot;name&quot;: &quot;Inner category B&quot;,
+                &quot;value&quot;: 3,
+                &quot;name_0&quot;: &quot;Top-level Category&quot;,
+                &quot;name_1&quot;: &quot;Inner category B&quot;
             },
         ]
     }
 ]
 ```
 
-The structure is flattened into a single array of objects. The `"name"` and
-`"value"` properties are left as-is for each item, but now each items contains
-properties `"name_X"` where X represents the category hierarchy. That is, if
+The structure is flattened into a single array of objects. The `&quot;name&quot;` and
+`&quot;value&quot;` properties are left as-is for each item, but now each items contains
+properties `&quot;name_X&quot;` where X represents the category hierarchy. That is, if
 your category hierarchy is
 
 ```
@@ -136,4 +148,5 @@ Then `name_0` will always be either `A` or `E`, `name_1` will always be `B`,
 
 ---
 
-Copyright &copy; 2017 Stitch
+Copyright &amp;copy; 2017 Stitch
+
